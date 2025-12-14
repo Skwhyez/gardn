@@ -33,6 +33,16 @@ static Element *make_entries(std::initializer_list<std::string const> contents) 
 
 static Element *make_changelog_contents() {
     Element *elt = new Ui::VContainer({
+        make_date("December 14th 2025"),
+        make_entries({
+            "Added 8 new petals",
+            "Added new zone",
+            "Reworked Yggdrasil",
+            "Nerfed drop rate by 2x",
+            "Nerfed eggs",
+            "Other balancing"
+        }),
+        make_divider(),
         make_date("December 3rd 2025"),
         make_entries({
             "Added game mode switch",
