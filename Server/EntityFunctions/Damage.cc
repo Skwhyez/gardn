@@ -13,7 +13,10 @@ static bool _yggdrasil_revival_clause(Simulation *sim, Entity &player) {
         if (slot.get_petal_id() != PetalID::kYggdrasil) continue;
         for (uint32_t j = 0; j < slot.size(); ++j) {
             LoadoutPetal &petal_slot = slot.petals[j];
-            if (sim->ent_alive(petal_slot.ent_id)) return true;
+            if (sim->ent_alive(petal_slot.ent_id)) {
+                sim->request_delete(petal_slot.ent_id);
+                return true;
+            }
         }
     }
     return false;
