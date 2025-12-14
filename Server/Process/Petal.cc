@@ -84,7 +84,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
             !BitMath::at(player.flags, EntityFlags::kZombie))
             potential = player.id;
         else
-            potential = find_teammate_to_heal(sim, petal, 200);
+            potential = find_teammate_to_heal(sim, petal, TEAMMATE_HEAL_RADIUS);
         if (potential != NULL_ENTITY) {
             Entity &ent = sim->get_ent(potential);
             Vector delta(ent.get_x() - petal.get_x(), ent.get_y() - petal.get_y());
@@ -97,7 +97,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
             petal.acceleration = delta;
         }
     } else if (petal_data.attributes.burst_shield > 0) {
-        EntityID potential = find_teammate_to_shield(sim, petal, 200, petal_data.attributes.burst_shield);
+        EntityID potential = find_teammate_to_shield(sim, petal, TEAMMATE_HEAL_RADIUS, petal_data.attributes.burst_shield);
         if (potential != NULL_ENTITY) {
             Entity &ent = sim->get_ent(potential);
             Vector delta(ent.get_x() - petal.get_x(), ent.get_y() - petal.get_y());

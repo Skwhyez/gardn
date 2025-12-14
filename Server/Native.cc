@@ -80,7 +80,6 @@ void Server::run() {
 }
 
 void Server::stop() {
-    if (Server::is_stopping) return;
     Server::is_stopping = true;
     std::cout << "stopping...\n";
     us_listen_socket_close(0, socket);

@@ -234,7 +234,7 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
         }
         //clump
         if (petal_data.attributes.clump_radius > 0) ++rot_pos;
-        player.set_loadout_reloads(i, min_reload * 255);
+        player.set_loadout_reloads(i, min_reload);
     };
     if (BitMath::at(player.input, InputFlags::kAttacking)) 
         player.set_face_flags(player.get_face_flags() | (1 << FaceFlags::kAttacking));

@@ -8,6 +8,7 @@ float const DEFAULT_FRICTION = 1.0f/3.0f;
 float const LIGHTNING_STRIKE_RADIUS = 300.0f;
 float const URANIUM_RADIATION_RADIUS = 1200.0f;
 float const DIGGER_SPAWN_CHANCE = 0.1f;
+float const TEAMMATE_HEAL_RADIUS = 200.0f;
 float const MAX_PICKUP_RANGE = 300.0f;
 
 float const BASE_FLOWER_RADIUS = 25.0f;

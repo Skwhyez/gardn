@@ -11,6 +11,7 @@ extern float const DEFAULT_FRICTION;
 extern float const LIGHTNING_STRIKE_RADIUS;
 extern float const URANIUM_RADIATION_RADIUS;
 extern float const DIGGER_SPAWN_CHANCE;
+extern float const TEAMMATE_HEAL_RADIUS;
 extern float const MAX_PICKUP_RANGE;
 
 extern float const BASE_FLOWER_RADIUS;
