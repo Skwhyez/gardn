@@ -142,6 +142,12 @@ void Renderer::round_line_cap() {
     }, id);
 }
 
+void Renderer::butt_line_cap() {
+    EM_ASM({
+    Module.ctxs[$0].lineCap = "butt";
+    }, id);
+}
+
 void Renderer::round_line_join() {
     EM_ASM({
     Module.ctxs[$0].lineJoin = "round";

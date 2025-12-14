@@ -52,6 +52,7 @@ Entity const &last, float radius, std::function<bool(Entity const &)> predicate)
         if (ent.get_team() == entity.get_team()) return;
         if (ent.immunity_ticks > 0) return;
         if (!ent.has_component(kMob) && !ent.has_component(kFlower)) return;
+        if (ent.health == 0 && ent.max_health > 0) return;
         if (!predicate(ent)) return;
         float dist = Vector(ent.get_x()-last.get_x(),ent.get_y()-last.get_y()).magnitude() - ent.get_radius();
         if (dist < min_dist) { min_dist = dist; ret = ent.id; }
@@ -85,6 +86,40 @@ EntityID find_teammate_to_heal(Simulation *simulation, Entity const &entity, flo
         float health_ratio = ent.health / ent.max_health;
         if (dist < radius && health_ratio < min_health_ratio) {
             min_health_ratio = health_ratio;
+            ret = ent.id;
+        }
+    });
+    return ret;
+}
+
+EntityID find_teammate_to_shield(Simulation *simulation, Entity const &entity, float radius, float shield) {
+    EntityID ret;
+    float min_shield = 10000;
+    simulation->spatial_hash.query(entity.get_x(), entity.get_y(), radius, radius, [&](Simulation *sim, Entity &ent){
+        if (!sim->ent_alive(ent.id)) return;
+        if (ent.get_team() != entity.get_team()) return;
+        if (!ent.has_component(kFlower)) return;
+        if (BitMath::at(ent.flags, EntityFlags::kZombie)) return;
+        float dist = Vector(ent.get_x()-entity.get_x(),ent.get_y()-entity.get_y()).magnitude();
+        if (dist < radius && ent.shield < min_shield && ent.shield + shield <= ent.max_health) {
+            min_shield = ent.shield;
+            ret = ent.id;
+        }
+    });
+    return ret;
+}
+
+EntityID find_nearest_magnet(Simulation *simulation, Entity const &entity, float radius) {
+    EntityID ret;
+    float min_dist = radius;
+    simulation->spatial_hash.query(entity.get_x(), entity.get_y(), radius, radius, [&](Simulation *sim, Entity &ent){
+        if (!sim->ent_alive(ent.id)) return;
+        if (!ent.has_component(kPetal)) return;
+        if (PETAL_DATA[ent.get_petal_id()].attributes.pickup_range == 0) return;
+        DEBUG_ONLY(assert(PETAL_DATA[ent.get_petal_id()].attributes.pickup_range <= radius);)
+        float dist = Vector(ent.get_x()-entity.get_x(),ent.get_y()-entity.get_y()).magnitude();
+        if (dist < min_dist && dist < PETAL_DATA[ent.get_petal_id()].attributes.pickup_range) {
+            min_dist = dist;
             ret = ent.id;
         }
     });

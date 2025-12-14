@@ -3,6 +3,7 @@
 #include <Client/StaticData.hh>
 
 #include <Helpers/Bits.hh>
+#include <Helpers/Vector.hh>
 
 #include <cmath>
 
@@ -43,6 +44,7 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx, PetalRenderAttribute
             break;
         case PetalID::kStinger: {
         case PetalID::kTringer:
+        case PetalID::kPinger:
             ctx.set_fill(0xff333333);
             ctx.set_stroke(0xff292929);
             ctx.set_line_width(3);
@@ -199,6 +201,7 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx, PetalRenderAttribute
         }
         case PetalID::kWeb:
         case PetalID::kTriweb:
+        case PetalID::kLargeWeb:
             ctx.set_fill(0xffffffff);
             ctx.set_stroke(0xffcfcfcf);
             ctx.round_line_cap();
@@ -1016,6 +1019,140 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx, PetalRenderAttribute
             ctx.line_to(-7, -5);
             ctx.fill();
             ctx.stroke();
+            break;
+        case PetalID::kSoil:
+            ctx.set_fill(0xff695118);
+            ctx.set_stroke(0xff554213);
+            ctx.set_line_width(3);
+            ctx.begin_path();
+            ctx.move_to(-7, -7);
+            ctx.line_to(2, -11);
+            ctx.line_to(9, -7);
+            ctx.line_to(10, 4);
+            ctx.line_to(0, 10);
+            ctx.line_to(-7, 8);
+            ctx.line_to(-10, 0);
+            ctx.line_to(-7, -7);
+            ctx.fill();
+            ctx.stroke();
+            break;
+        case PetalID::kPowder: {
+            std::array<float, 15> magic1 = {
+                0.29652830958366394, 0.9893031120300293, 0.7122714519500732,
+                0.9056259393692017, 0.8531715273857117, 0.5379303693771362,
+                0.961118221282959, 0.6379047632217407, 0.5198644399642944,
+                0.8135024309158325, 0.9665305614471436, 0.9950006008148193,
+                0.9969583749771118, 0.6786581873893738, 0.33334872126579285,
+            };
+            std::array<float, 15> magic2 = {
+                4.726043224334717, 1.6176453828811646, 3.486619472503662,
+                5.706995010375977, 0.6529965400695801, 2.350846529006958,
+                1.4534027576446533, 3.7123541831970215, 0.8349775671958923,
+                2.1903045177459717, 2.396843671798706, 3.7029001712799072,
+                3.5439674854278564, 5.037447929382324, 4.9235992431640625,
+            };
+            ctx.set_fill(0xffeeeeee);
+            for (uint32_t i = 0; i < 15; ++i) {
+                float animation = cosf((attrs.animation / 1000 + i / 15.0) * 2 * M_PI);
+                float radius = magic1[i] * animation * 10;
+                float angle = magic2[i] + animation * 2 * M_PI;
+                ctx.begin_path();
+                ctx.arc(radius * cosf(angle), radius * sinf(angle), 4);
+                ctx.fill();
+            }
+            break;
+        }
+        case PetalID::kShell:
+            ctx.scale(0.5);
+            ctx.translate(-5, 0);
+            ctx.set_fill(0xfffcdd86);
+            ctx.set_stroke(0xffccb36d);
+            ctx.set_line_width(5);
+            ctx.begin_path();
+            ctx.partial_arc(0, 0, 30, -0.4 * M_PI, 0.4 * M_PI, 0);
+            ctx.qcurve_to(0, 20, -15, 8);
+            ctx.qcurve_to(-20, 0, -15, -8);
+            ctx.qcurve_to(0, -20, 30 * cosf(-0.4 * M_PI), 30 * sinf(-0.4 * M_PI));
+            ctx.fill();
+            ctx.stroke();
+            ctx.set_line_width(4);
+            ctx.begin_path();
+            ctx.move_to(12, 15);
+            ctx.qcurve_to(0, 8, -8, 5);
+            ctx.stroke();
+            ctx.begin_path();
+            ctx.move_to(17.4, 6);
+            ctx.qcurve_to(0, 3.2, -6.2, 2);
+            ctx.stroke();
+            ctx.begin_path();
+            ctx.move_to(17.4, -6);
+            ctx.qcurve_to(0, -3.2, -6.2, -2);
+            ctx.stroke();
+            ctx.begin_path();
+            ctx.move_to(12, -15);
+            ctx.qcurve_to(0, -8, -8, -5);
+            ctx.stroke();
+            break;
+        case PetalID::kSponge:
+            ctx.set_fill(0xffefc99a);
+            ctx.set_stroke(0xffc2a37d);
+            ctx.set_line_width(3);
+            ctx.begin_path();
+            for (uint32_t i = 0; i < 7; ++i) {
+                Vector point1 = Vector().unit_normal(2 * M_PI * i / 7).set_magnitude(r);
+                Vector point2 = Vector().unit_normal(2 * M_PI * (i + 1) / 7).set_magnitude(r);
+                Vector center = (point1 + point2) * 0.5;
+                float radius = (point1 - point2).magnitude() * 0.5;
+                float angle1 = (point1 - center).angle();
+                float angle2 = (point2 - center).angle();
+                ctx.partial_arc(center.x, center.y, radius, angle1, angle2, 0);
+            }
+            ctx.fill();
+            ctx.stroke();
+            break;
+        case PetalID::kHoney:
+            ctx.set_fill(0xfff7cf2f);
+            ctx.set_stroke(0xffc8a826);
+            ctx.set_line_width(3);
+            ctx.begin_path();
+            ctx.move_to(r, 0);
+            for (uint32_t i = 1; i <= 6; ++i) {
+                float angle = 2 * M_PI * i / 6;
+                ctx.line_to(r * cosf(angle), r * sinf(angle));
+            }
+            ctx.fill();
+            ctx.stroke();
+            break;
+        case PetalID::kMagnet:
+            ctx.scale(0.6);
+            ctx.translate(-25, 0);
+            for (uint32_t i = 0; i < 2; ++i) {
+                ctx.set_line_width(28);
+                ctx.set_stroke(0xff363685);
+                ctx.begin_path();
+                ctx.move_to(39.5, 18);
+                ctx.qcurve_to(0, 30, 0, 0);
+                ctx.stroke();
+                ctx.set_line_width(16.8);
+                ctx.set_stroke(0xff4343a4);
+                ctx.begin_path();
+                ctx.move_to(40, 18);
+                ctx.qcurve_to(0, 30, 0, 0);
+                ctx.stroke();
+                ctx.set_line_width(28);
+                ctx.set_stroke(0xff853636);
+                ctx.begin_path();
+                ctx.move_to(39.5, -18);
+                ctx.qcurve_to(0, -30, 0, 0);
+                ctx.stroke();
+                ctx.set_line_width(16.8);
+                ctx.set_stroke(0xffa44343);
+                ctx.begin_path();
+                ctx.move_to(40, -18);
+                ctx.qcurve_to(0, -30, 0, 0);
+                ctx.stroke();
+                ctx.butt_line_cap();
+            }
             break;
         default:
             assert(id < PetalID::kNumPetals);

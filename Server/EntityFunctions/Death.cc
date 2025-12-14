@@ -85,8 +85,21 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
         }
 
     } else if (ent.has_component(kPetal)) {
-        if (ent.get_petal_id() == PetalID::kWeb || ent.get_petal_id() == PetalID::kTriweb)
-            alloc_web(sim, 100, ent);
+        if (ent.get_petal_id() == PetalID::kWeb ||
+            ent.get_petal_id() == PetalID::kTriweb ||
+            ent.get_petal_id() == PetalID::kLargeWeb)
+            alloc_web(sim, PETAL_DATA[ent.get_petal_id()].attributes.radius, ent);
+        else if (ent.get_petal_id() == PetalID::kSponge) {
+            Entity &parent = sim->get_ent(ent.get_parent());
+            if (get_sponge_period(sim, parent) == 0) {
+                float dmg = 0;
+                for (uint32_t i = 0; i < MAX_SPONGE_PERIOD; ++i) {
+                    dmg += parent.delayed_damage[i];
+                    parent.delayed_damage[i] = 0;
+                }
+                inflict_damage(sim, parent.last_damaged_by, parent.id, dmg, DamageType::kSponge);
+            }
+        }
     } else if (ent.has_component(kFlower)) {
         std::vector<PetalID::T> potential = {};
         for (uint32_t i = 0; i < ent.get_loadout_count() + MAX_SLOT_COUNT; ++i) {

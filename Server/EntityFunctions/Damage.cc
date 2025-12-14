@@ -13,10 +13,27 @@ static bool _yggdrasil_revival_clause(Simulation *sim, Entity &player) {
         if (slot.get_petal_id() != PetalID::kYggdrasil) continue;
         for (uint32_t j = 0; j < slot.size(); ++j) {
             LoadoutPetal &petal_slot = slot.petals[j];
-            if (sim->ent_alive(petal_slot.ent_id)) return true;
+            if (sim->ent_alive(petal_slot.ent_id)) {
+                sim->request_delete(petal_slot.ent_id);
+                return true;
+            }
         }
     }
     return false;
+}
+
+game_tick_t get_sponge_period(Simulation *sim, Entity &player) {
+    if (!player.has_component(kFlower)) return 0;
+    for (uint32_t i = 0; i < player.get_loadout_count(); ++i) {
+        LoadoutSlot &slot = player.loadout[i];
+        if (slot.get_petal_id() != PetalID::kSponge) continue;
+        for (uint32_t j = 0; j < slot.size(); ++j) {
+            LoadoutPetal &petal_slot = slot.petals[j];
+            if (sim->ent_alive(petal_slot.ent_id))
+                return PETAL_DATA[slot.get_petal_id()].attributes.period * TPS;
+        }
+    }
+    return 0;
 }
 
 void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_id, float amt, uint8_t type) {
@@ -39,10 +56,28 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
     else if (type == DamageType::kPoison) amt -= defender.poison_armor;
     if (amt <= 0) return;
     //if (amt <= defender.armor) return;
+    float damage_dealt = std::min(amt, defender.health + defender.shield);
+    if (type != DamageType::kPassive) {
+        if (type != DamageType::kSponge) {
+            defender.set_damaged(1);
+            if (type != DamageType::kReflect) {
+                game_tick_t period = get_sponge_period(sim, defender);
+                if (period > 0) {
+                    DEBUG_ONLY(assert(period <= MAX_SPONGE_PERIOD);)
+                    float dmg = amt / period;
+                    for (uint32_t i = 0; i < period; ++i)
+                        defender.delayed_damage[i] += dmg;
+                    amt = 0;
+                }
+            }
+        }
+        float old_shield = defender.shield;
+        defender.shield = fclamp(defender.shield - amt, 0, defender.shield);
+        amt -= old_shield - defender.shield;
+    }
     float old_health = defender.health;
-    if (type != DamageType::kPassive) defender.set_damaged(1);
     defender.health = fclamp(defender.health - amt, 0, defender.health);  
-    float damage_dealt = old_health - defender.health;
+    amt -= old_health - defender.health;
     //ant hole spawns
     //floor start, ceil end
     if (defender.has_component(kMob) && defender.get_mob_id() == MobID::kAntHole) {
@@ -78,13 +113,16 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
             defender.poison_ticks = 0;
             defender.slow_ticks = 0;
             defender.dandy_ticks = 0;
+            defender.honey_ticks = 0;
             defender.immunity_ticks = 1.0 * TPS;
+            for (uint32_t i = 0; i < MAX_SPONGE_PERIOD; ++i)
+                defender.delayed_damage[i] = 0;
         }
     }
     if (!sim->ent_exists(atk_id)) return;
     Entity &attacker = sim->get_ent(atk_id);
 
-    if (type != DamageType::kReflect && defender.damage_reflection > 0)
+    if (type != DamageType::kReflect && type != DamageType::kSponge && defender.damage_reflection > 0)
         inflict_damage(sim, def_id, attacker.base_entity, damage_dealt * defender.damage_reflection, DamageType::kReflect);
 
     if (type == DamageType::kContact && defender.get_revived() == 0) {
@@ -97,10 +135,12 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
         if (defender.slow_ticks < attacker.slow_inflict)
             defender.slow_ticks = attacker.slow_inflict;
 
-        if (attacker.has_component(kPetal) &&
-            attacker.get_petal_id() == PetalID::kDandelion &&
-            defender.dandy_ticks < 10 * TPS)
-            defender.dandy_ticks = 10 * TPS;
+        if (attacker.has_component(kPetal)) {
+            if (attacker.get_petal_id() == PetalID::kDandelion && defender.dandy_ticks < 10 * TPS)
+                defender.dandy_ticks = 10 * TPS;
+            else if (attacker.get_petal_id() == PetalID::kHoney && defender.honey_ticks < 5 * TPS)
+                defender.honey_ticks = 5 * TPS;
+        }
     }
 
     if (!sim->ent_alive(defender.target)) {

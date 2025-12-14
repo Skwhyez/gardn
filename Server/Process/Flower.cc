@@ -17,6 +17,8 @@ struct PlayerBuffs {
     float extra_damage = 0;
     float damage_factor = 1;
     float reload_factor = 1;
+    float extra_radius = 0;
+    float health_factor = 1;
     uint8_t yinyang_count = 0;
     uint8_t is_poisonous = 0;
     uint8_t equip_flags = 0;
@@ -56,6 +58,9 @@ static struct PlayerBuffs _get_petal_passive_buffs(Simulation *sim, Entity &play
             buffs.heal += attrs.constant_heal / TPS;
         buffs.extra_rot += attrs.extra_rotation_speed;
         buffs.extra_health += attrs.extra_health;
+        buffs.extra_radius += attrs.extra_radius;
+        buffs.health_factor *= attrs.health_factor;
+        player.speed_ratio *= attrs.speed_factor;
         player.damage_reflection = std::fmax(player.damage_reflection, attrs.damage_reflection);
         player.poison_armor = std::fmax(player.poison_armor, attrs.poison_armor / TPS);
         if (slot_petal_id == PetalID::kPoisonCactus)
@@ -103,8 +108,9 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
     PlayerBuffs const buffs = _get_petal_passive_buffs(sim, player);
     float health_ratio = player.health / player.max_health;
     if (!player.has_component(kMob)) {
-        player.max_health = hp_at_level(score_to_level(player.get_score())) + buffs.extra_health;
+        player.max_health = hp_at_level(score_to_level(player.get_score())) * buffs.health_factor + buffs.extra_health;
         player.damage = BASE_BODY_DAMAGE + buffs.extra_damage;
+        player.set_radius(BASE_FLOWER_RADIUS + buffs.extra_radius);
     }
     player.health = health_ratio * player.max_health;
     if (buffs.heal > 0)
@@ -228,7 +234,7 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
         }
         //clump
         if (petal_data.attributes.clump_radius > 0) ++rot_pos;
-        player.set_loadout_reloads(i, min_reload * 255);
+        player.set_loadout_reloads(i, min_reload);
     };
     if (BitMath::at(player.input, InputFlags::kAttacking)) 
         player.set_face_flags(player.get_face_flags() | (1 << FaceFlags::kAttacking));
@@ -238,19 +244,22 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
         player.set_face_flags(player.get_face_flags() | (1 << FaceFlags::kPoisoned));
     if (player.dandy_ticks > 0)
         player.set_face_flags(player.get_face_flags() | (1 << FaceFlags::kDandelioned));
+    if (player.honey_ticks > 0)
+        player.set_face_flags(player.get_face_flags() | (1 << FaceFlags::kHoneyed));
     if (player.get_dev())
         player.set_face_flags(player.get_face_flags() | (1 << FaceFlags::kDeveloper));
+    float rot = (BASE_PETAL_ROTATION_SPEED * (player.honey_ticks > 0 ? 0.5 : 1) + buffs.extra_rot) / TPS;
     if (buffs.yinyang_count < 8) {
         switch (buffs.yinyang_count % 3) {
             case 0:
-                player.heading_angle += (BASE_PETAL_ROTATION_SPEED + buffs.extra_rot) / TPS;
+                player.heading_angle += rot;
                 break;
             case 1:
-                player.heading_angle -= (BASE_PETAL_ROTATION_SPEED + buffs.extra_rot) / TPS;
+                player.heading_angle -= rot;
                 break;
             default:
                 break;
         }
     } else 
-        player.heading_angle += 10 * (BASE_PETAL_ROTATION_SPEED + buffs.extra_rot) / TPS;
+        player.heading_angle += 10 * rot;
 }

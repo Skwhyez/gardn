@@ -16,7 +16,7 @@ static bool _should_interact(Entity const &ent1, Entity const &ent2) {
     return false;
 }
 
-static void _pickup_drop(Simulation *sim, Entity &player, Entity &drop) {
+void pickup_drop(Simulation *sim, Entity &player, Entity &drop) {
     if (!sim->ent_alive(player.get_parent())) return;
     if (drop.immunity_ticks > 0) return;
 
@@ -116,12 +116,12 @@ void on_collide(Simulation *sim, Entity &ent1, Entity &ent2) {
     }
 
     if (ent1.has_component(kDrop) && ent2.has_component(kFlower)) 
-        _pickup_drop(sim, ent2, ent1);
+        pickup_drop(sim, ent2, ent1);
     if (ent2.has_component(kDrop) && ent1.has_component(kFlower))
-        _pickup_drop(sim, ent1, ent2);
+        pickup_drop(sim, ent1, ent2);
 
     if (ent1.has_component(kWeb) && !ent2.has_component(kPetal) && !ent2.has_component(kDrop))
-        ent2.speed_ratio = 0.5;
+        ent2.speed_ratio *= 0.5;
     if (ent2.has_component(kWeb) && !ent1.has_component(kPetal) && !ent1.has_component(kDrop))
-        ent1.speed_ratio = 0.5;
+        ent1.speed_ratio *= 0.5;
 }

@@ -3,7 +3,7 @@
 #include <Helpers/Bits.hh>
 #include <Helpers/UTF8.hh>
 
-static const uint32_t PROTOCOL_FLOAT_SCALE = 256;
+static const uint32_t PROTOCOL_FLOAT_SCALE = 65536;
 
 
 Writer::Writer(uint8_t *v) : at(v), packet(v) {}

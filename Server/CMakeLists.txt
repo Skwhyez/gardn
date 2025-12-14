@@ -16,6 +16,7 @@ set(SOURCES
     Process/Collision.cc
     Process/Culling.cc
     Process/Curse.cc
+    Process/Drop.cc
     Process/Flower.cc
     Process/FlowerAi.cc
     Process/Health.cc

@@ -9,7 +9,8 @@
 
 #include <cstdint>
 
-typedef CircularArray<PetalID::T, MAX_SLOT_COUNT> circ_arr_t;
+typedef CircularArray<PetalID::T, MAX_SLOT_COUNT> deleted_petals_t;
+typedef CircularArray<float, MAX_SPONGE_PERIOD> delayed_damage_t;
 
 SERVER_ONLY(class Writer;)
 CLIENT_ONLY(class Reader;)

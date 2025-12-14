@@ -12,10 +12,8 @@ void Entity::tick_lerp(float amt) {
     if (has_component(kPhysics)) {
         float prev_x = x;
         float prev_y = y;
-        if (!pending_delete) {
-            x.step(amt);
-            y.step(amt);
-        }
+        x.step(amt);
+        y.step(amt);
         if (has_component(kMob)) {
             Vector vel(x - prev_x, y - prev_y);
             animation += (1 + 0.75 * vel.magnitude()) * 0.075;
@@ -50,6 +48,7 @@ void Entity::tick_lerp(float amt) {
     }
     if (has_component(kHealth)) {
         health_ratio.step(amt);
+        shield_ratio.step(amt);
         if (damaged == 1 && damage_flash < 0.1 && !pending_delete)
             damage_flash = 1;
         else //damage_flash = fclamp(damage_flash - Ui::dt / 150, 0, 1);
@@ -66,7 +65,7 @@ void Entity::tick_lerp(float amt) {
                 if (frand() < fclamp(revival_burst * Ui::dt * 60 / 1000, 0, 1))
                     Particle::add_revival_particle(x, y);
         revived.clear();
-        if ((float) health_ratio > 0.999)
+        if ((float) health_ratio > 0.999 && (float) shield_ratio < 0.01)
             healthbar_opacity = lerp(healthbar_opacity, 0, amt);
         else
             healthbar_opacity = 1;
@@ -82,6 +81,7 @@ void Entity::tick_lerp(float amt) {
         if (BitMath::at(face_flags, FaceFlags::kAttacking)
             || BitMath::at(face_flags, FaceFlags::kPoisoned) 
             || BitMath::at(face_flags, FaceFlags::kDandelioned)
+            || BitMath::at(face_flags, FaceFlags::kHoneyed)
             || pending_delete) mouth = lerp(mouth, 5, amt);
         else if (BitMath::at(face_flags, FaceFlags::kDefending)) mouth = lerp(mouth, 8, amt);
         else mouth = lerp(mouth, 15, amt);

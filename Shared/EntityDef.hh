@@ -72,7 +72,7 @@ SINGLE(Flower, face_flags, uint8_t) \
 SINGLE(Flower, equip_flags, uint8_t) \
 SINGLE(Flower, leaderboard_pos, uint8_t) \
 MULTIPLE(Flower, loadout_ids, PetalID::T, 2 * MAX_SLOT_COUNT) \
-MULTIPLE(Flower, loadout_reloads, uint8_t, MAX_SLOT_COUNT)
+MULTIPLE(Flower, loadout_reloads, float, MAX_SLOT_COUNT)
 
 #define FIELDS_Petal \
 SINGLE(Petal, petal_id, PetalID::T) \
@@ -80,6 +80,7 @@ SINGLE(Petal, petal_flags, uint8_t)
 
 #define FIELDS_Health \
 SINGLE(Health, health_ratio, Float) \
+SINGLE(Health, shield_ratio, Float) \
 SINGLE(Health, damaged, StickyFlag) \
 SINGLE(Health, revived, StickyFlag)
 
@@ -131,6 +132,7 @@ SINGLE(Animation, anim_type, uint8_t)
     SINGLE(slow_inflict, game_tick_t, =0) \
     SINGLE(immunity_ticks, game_tick_t, =0) \
     SINGLE(dandy_ticks, game_tick_t, =0) \
+    SINGLE(honey_ticks, game_tick_t, =0) \
     SINGLE(poison_ticks, game_tick_t, =0) \
     SINGLE(despawn_tick, game_tick_t, =0) \
     SINGLE(secondary_reload, game_tick_t, =0) \
@@ -141,6 +143,7 @@ SINGLE(Animation, anim_type, uint8_t)
     SINGLE(poison_dealer, EntityID, =NULL_ENTITY) \
     SINGLE(poison_damage, PoisonDamage, ={}) \
     SINGLE(health, float, =0) \
+    SINGLE(shield, float, =0) \
     SINGLE(max_health, float, =0) \
     SINGLE(damage, float, =0) \
     SINGLE(armor, float, =0) \
@@ -159,7 +162,8 @@ SINGLE(Animation, anim_type, uint8_t)
     \
     SINGLE(zone, uint8_t, =0) \
     SINGLE(deletion_tick, uint8_t, =0) \
-    SINGLE(deleted_petals, circ_arr_t, ={}) \
+    SINGLE(deleted_petals, deleted_petals_t, ={}) \
+    SINGLE(delayed_damage, delayed_damage_t, ={}) \
     SINGLE(client, Client *, =nullptr) \
     \
     SINGLE(chat_sent, EntityID, =NULL_ENTITY) \

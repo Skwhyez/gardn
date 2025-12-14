@@ -56,6 +56,7 @@ public:
     
     void round_line_join();
     void round_line_cap();
+    void butt_line_cap();
     void center_text_align();
     void center_text_baseline();
     void set_line_width(float);

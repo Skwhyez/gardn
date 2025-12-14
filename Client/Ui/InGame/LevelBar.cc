@@ -34,12 +34,16 @@ void LevelBar::on_render(Renderer &ctx) {
     ctx.move_to(-width / 2, 0);
     ctx.line_to(width / 2, 0);
     ctx.stroke();
-    ctx.set_stroke(0xfff9e496);
-    ctx.set_line_width(height * 0.8);
-    ctx.begin_path();
-    ctx.move_to(-width / 2, 0);
-    ctx.line_to(-width / 2 + width * ((float) progress), 0);
-    ctx.stroke();
+    {
+        RenderContext context(&ctx);
+        ctx.set_global_alpha(std::min((float) progress * 20, 1.0f));
+        ctx.set_stroke(0xfff9e496);
+        ctx.set_line_width(height * 0.8);
+        ctx.begin_path();
+        ctx.move_to(-width / 2, 0);
+        ctx.line_to(-width / 2 + width * ((float) progress), 0);
+        ctx.stroke();
+    }
 
     std::string text = "Lvl " + std::to_string(level) + " Flower";
     ctx.draw_text(text.c_str(), { .size = 16 });

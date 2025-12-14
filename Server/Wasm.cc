@@ -170,7 +170,6 @@ void Server::run() {
 }
 
 void Server::stop() {
-    if (Server::is_stopping) return;
     Server::is_stopping = true;
     std::cout << "stopping...\n";
     EM_ASM({

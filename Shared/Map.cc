@@ -26,10 +26,18 @@ uint32_t Map::get_zone_from_pos(float x, float y) {
 }
 
 uint32_t Map::get_suitable_difficulty_zone(uint32_t power) {
-    std::vector<uint32_t> possible_zones;
+    StaticArray<uint32_t, MAP_DATA.size()> possible_zones;
     for (uint32_t i = 0; i < MAP_DATA.size(); ++i)
-        if (MAP_DATA[i].difficulty == power) possible_zones.push_back(i);
-    if (possible_zones.size() == 0) return 0;
+        if (MAP_DATA[i].difficulty == power) possible_zones.push(i);
+    DEBUG_ONLY(assert(possible_zones.size() > 0);)
+    return possible_zones[frand() * possible_zones.size()];
+}
+
+uint32_t Map::get_random_zone_with_spawns() {
+    StaticArray<uint32_t, MAP_DATA.size()> possible_zones;
+    for (uint32_t i = 0; i < MAP_DATA.size(); ++i)
+        if (MAP_DATA[i].spawns.size() > 0) possible_zones.push(i);
+    DEBUG_ONLY(assert(possible_zones.size() > 0);)
     return possible_zones[frand() * possible_zones.size()];
 }
 
@@ -44,11 +52,12 @@ void Map::spawn_random_mob(Simulation *sim, float x, float y) {
     uint32_t zone_id = Map::get_zone_from_pos(x, y);
     struct ZoneDefinition const &zone = MAP_DATA[zone_id];
     if (zone.density * (zone.right - zone.left) * (zone.bottom - zone.top) / (500 * 500) < sim->zone_mob_counts[zone_id]) return;
+    auto spawns = zone.spawns.size() > 0 ? zone.spawns : MAP_DATA[Map::get_random_zone_with_spawns()].spawns;
     float sum = 0;
-    for (SpawnChance const &s : zone.spawns)
+    for (SpawnChance const &s : spawns)
         sum += s.chance;
     sum *= frand();
-    for (SpawnChance const &s : zone.spawns) {
+    for (SpawnChance const &s : spawns) {
         sum -= s.chance;
         if (sum <= 0) {
             Entity &ent = alloc_mob(sim, s.id, x, y, NULL_ENTITY, [&](Entity &mob){

@@ -84,12 +84,25 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
             !BitMath::at(player.flags, EntityFlags::kZombie))
             potential = player.id;
         else
-            potential = find_teammate_to_heal(sim, petal, 200);
+            potential = find_teammate_to_heal(sim, petal, TEAMMATE_HEAL_RADIUS);
         if (potential != NULL_ENTITY) {
             Entity &ent = sim->get_ent(potential);
             Vector delta(ent.get_x() - petal.get_x(), ent.get_y() - petal.get_y());
             if (delta.magnitude() < petal.get_radius()) {
                 inflict_heal(sim, ent, petal_data.attributes.burst_heal);
+                sim->request_delete(petal.id);
+                return;
+            }
+            delta.set_magnitude(PLAYER_ACCELERATION * 4);
+            petal.acceleration = delta;
+        }
+    } else if (petal_data.attributes.burst_shield > 0) {
+        EntityID potential = find_teammate_to_shield(sim, petal, TEAMMATE_HEAL_RADIUS, petal_data.attributes.burst_shield);
+        if (potential != NULL_ENTITY) {
+            Entity &ent = sim->get_ent(potential);
+            Vector delta(ent.get_x() - petal.get_x(), ent.get_y() - petal.get_y());
+            if (delta.magnitude() < petal.get_radius()) {
+                ent.shield += petal_data.attributes.burst_shield;
                 sim->request_delete(petal.id);
                 return;
             }
@@ -122,6 +135,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
                 entity_set_despawn_tick(petal, 3 * TPS);
             }
             break;
+        case PetalID::kLargeWeb:
         case PetalID::kTriweb:
         case PetalID::kWeb: {
             if (BitMath::at(player.input, InputFlags::kAttacking)) {
@@ -190,7 +204,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
         }
         case PetalID::kUranium: {
             std::vector<EntityID> targets = find_enemies_to_radiate(sim, petal, URANIUM_RADIATION_RADIUS);
-            inflict_damage(sim, petal.id, petal.get_parent(), 2 * petal.damage, DamageType::kUranium);
+            inflict_damage(sim, NULL_ENTITY, petal.get_parent(), 3 * petal.damage, DamageType::kUranium);
             for (EntityID target : targets)
                 inflict_damage(sim, petal.id, target, petal.damage, DamageType::kUranium);
             petal.secondary_reload = 0;

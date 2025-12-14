@@ -5,15 +5,14 @@
 #include <array>
 #include <cstdint>
 
-extern uint32_t const MAX_LEVEL;
-extern uint32_t const TPS;
-
 extern float const PETAL_DISABLE_DELAY;
 extern float const PLAYER_ACCELERATION;
 extern float const DEFAULT_FRICTION;
 extern float const LIGHTNING_STRIKE_RADIUS;
 extern float const URANIUM_RADIATION_RADIUS;
 extern float const DIGGER_SPAWN_CHANCE;
+extern float const TEAMMATE_HEAL_RADIUS;
+extern float const MAX_PICKUP_RANGE;
 
 extern float const BASE_FLOWER_RADIUS;
 extern float const BASE_PETAL_ROTATION_SPEED;
@@ -100,9 +99,9 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
     {
         .left = 30000,
         .top = 0,
-        .right = 40000,
+        .right = 35000,
         .bottom = 4000,
-        .density = 3,
+        .density = 1,
         .drop_multiplier = 0.025,
         .spawns = {
             { MobID::kDarkLadybug, 150000 },
@@ -117,7 +116,19 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
         },
         .difficulty = 3,
         .color = 0xff777777,
-        .name = "???"
+        .name = "PvP"
+    },
+    {
+        .left = 35000,
+        .top = 0,
+        .right = 40000,
+        .bottom = 4000,
+        .density = 3,
+        .drop_multiplier = 0,
+        .spawns = {},
+        .difficulty = 4,
+        .color = 0xff7a5c99,
+        .name = "PvE"
     }
 });
 

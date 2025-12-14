@@ -36,6 +36,6 @@ void Server::tick() {
         was_draining = true;
         std::cout << "draining...\n";
     }
-    if (Server::is_draining && Server::player_count == 0)
+    if (Server::is_draining && !Server::is_stopping && Server::player_count == 0)
         Server::stop();
 }

@@ -5,18 +5,21 @@
 
 #include <cstdint>
 
+inline uint32_t const MAX_LEVEL = 99;
+inline uint32_t const TPS = 20;
 inline uint32_t const ARENA_WIDTH = 40000;
 inline uint32_t const ARENA_HEIGHT = 4000;
 
 inline uint32_t const MAX_SLOT_COUNT = 12;
 inline uint32_t const LEVELS_PER_EXTRA_SLOT = 15;
 inline uint32_t const LEADERBOARD_SIZE = 10;
-inline uint32_t const MAX_PETALS_IN_CLUMP = 4;
+inline uint32_t const MAX_PETALS_IN_CLUMP = 5;
 inline uint32_t const MAX_DIFFICULTY = 3;
 inline uint32_t const MAX_DROPS_PER_MOB = 6;
 inline uint32_t const CHAT_SIZE = 5;
 inline uint32_t const FIRE_ANT_COUNT = 20;
 inline uint32_t const MAX_LIGHTNING_BOUNCES = 15;
+inline uint32_t const MAX_SPONGE_PERIOD = 10 * TPS;
 
 namespace DamageType {
     enum : uint8_t {
@@ -25,7 +28,8 @@ namespace DamageType {
         kPoison,
         kReflect,
         kLightning,
-        kUranium
+        kUranium,
+        kSponge
     };
 }
 
@@ -97,6 +101,14 @@ namespace PetalID {
         kLightning,
         kOldLightning,
         kUranium,
+        kPinger,
+        kLargeWeb,
+        kSoil,
+        kPowder,
+        kShell,
+        kSponge,
+        kHoney,
+        kMagnet,
         kNumPetals
     };
 };
@@ -194,6 +206,7 @@ namespace FaceFlags {
         kDefending,
         kPoisoned,
         kDandelioned,
+        kHoneyed,
         kDeadEyes,
         kSquareEyes,
         kDeveloper
@@ -258,6 +271,13 @@ struct PetalAttributes {
     float damage_reflection = 0;
     float extra_damage_factor = 1;
     float extra_reload_factor = 1;
+    float radius = 0;
+    float extra_radius = 0;
+    float speed_factor = 1;
+    float health_factor = 1;
+    float burst_shield = 0;
+    float period = 0;
+    float pickup_range = 0;
     struct PoisonDamage poison_damage;
     uint8_t defend_only = 0;
     float icon_angle = 0;
