@@ -53,27 +53,27 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
     else if (type == DamageType::kPoison) amt -= defender.poison_armor;
     if (amt <= 0) return;
     //if (amt <= defender.armor) return;
-    float damage_dealt = 0;
+    float damage_dealt = std::min(amt, defender.health + defender.shield);
     if (type != DamageType::kPassive) {
         if (type != DamageType::kSponge) {
             defender.set_damaged(1);
-            game_tick_t period = get_sponge_period(sim, defender);
-            if (period > 0) {
-                DEBUG_ONLY(assert(period <= MAX_SPONGE_PERIOD);)
-                float dmg = amt / period;
-                for (uint32_t i = 0; i < period; ++i)
-                    defender.delayed_damage[i] += dmg;
-                amt = 0;
+            if (type != DamageType::kReflect) {
+                game_tick_t period = get_sponge_period(sim, defender);
+                if (period > 0) {
+                    DEBUG_ONLY(assert(period <= MAX_SPONGE_PERIOD);)
+                    float dmg = amt / period;
+                    for (uint32_t i = 0; i < period; ++i)
+                        defender.delayed_damage[i] += dmg;
+                    amt = 0;
+                }
             }
         }
         float old_shield = defender.shield;
         defender.shield = fclamp(defender.shield - amt, 0, defender.shield);
-        damage_dealt += old_shield - defender.shield;
         amt -= old_shield - defender.shield;
     }
     float old_health = defender.health;
     defender.health = fclamp(defender.health - amt, 0, defender.health);  
-    damage_dealt += old_health - defender.health;
     amt -= old_health - defender.health;
     //ant hole spawns
     //floor start, ceil end
@@ -112,12 +112,14 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
             defender.dandy_ticks = 0;
             defender.honey_ticks = 0;
             defender.immunity_ticks = 1.0 * TPS;
+            for (uint32_t i = 0; i < MAX_SPONGE_PERIOD; ++i)
+                defender.delayed_damage[i] = 0;
         }
     }
     if (!sim->ent_exists(atk_id)) return;
     Entity &attacker = sim->get_ent(atk_id);
 
-    if (type != DamageType::kReflect && defender.damage_reflection > 0)
+    if (type != DamageType::kReflect && type != DamageType::kSponge && defender.damage_reflection > 0)
         inflict_damage(sim, def_id, attacker.base_entity, damage_dealt * defender.damage_reflection, DamageType::kReflect);
 
     if (type == DamageType::kContact && defender.get_revived() == 0) {
