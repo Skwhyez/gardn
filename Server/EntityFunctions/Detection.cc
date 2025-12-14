@@ -52,6 +52,7 @@ Entity const &last, float radius, std::function<bool(Entity const &)> predicate)
         if (ent.get_team() == entity.get_team()) return;
         if (ent.immunity_ticks > 0) return;
         if (!ent.has_component(kMob) && !ent.has_component(kFlower)) return;
+        if (ent.health == 0 && ent.max_health > 0) return;
         if (!predicate(ent)) return;
         float dist = Vector(ent.get_x()-last.get_x(),ent.get_y()-last.get_y()).magnitude() - ent.get_radius();
         if (dist < min_dist) { min_dist = dist; ret = ent.id; }

@@ -238,7 +238,7 @@ Entity &alloc_camera(Simulation *sim, EntityID const team) {
     ent.set_respawn_level(1);
     for (uint32_t i = 0; i < loadout_slots_at_level(ent.get_respawn_level()); ++i)
         ent.set_inventory(i, PetalID::kBasic);
-    if (frand() < 0.0001 && PetalTracker::get_count(PetalID::kUniqueBasic) == 0)
+    if (frand() < 0.001 && PetalTracker::get_count(PetalID::kUniqueBasic) == 0)
         ent.set_inventory(0, PetalID::kUniqueBasic);
     for (uint32_t i = 0; i < 2 * MAX_SLOT_COUNT; ++i)
         PetalTracker::add_petal(ent.get_inventory(i));
@@ -265,7 +265,7 @@ Entity &alloc_cpu_camera(Simulation *sim, EntityID const team) {
     for (uint32_t i = 0; i < loadout_slots_at_level(ent.get_respawn_level()); ++i)
         ent.set_inventory(i, inventory[i]);
     
-    if (frand() < 0.0001 && PetalTracker::get_count(PetalID::kUniqueBasic) == 0)
+    if (frand() < 0.001 && PetalTracker::get_count(PetalID::kUniqueBasic) == 0)
         ent.set_inventory(0, PetalID::kUniqueBasic);
     for (uint32_t i = 0; i < 2 * MAX_SLOT_COUNT; ++i)
         PetalTracker::add_petal(ent.get_inventory(i));

@@ -204,7 +204,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
         }
         case PetalID::kUranium: {
             std::vector<EntityID> targets = find_enemies_to_radiate(sim, petal, URANIUM_RADIATION_RADIUS);
-            inflict_damage(sim, NULL_ENTITY, petal.get_parent(), 2 * petal.damage, DamageType::kUranium);
+            inflict_damage(sim, NULL_ENTITY, petal.get_parent(), 3 * petal.damage, DamageType::kUranium);
             for (EntityID target : targets)
                 inflict_damage(sim, petal.id, target, petal.damage, DamageType::kUranium);
             petal.secondary_reload = 0;
