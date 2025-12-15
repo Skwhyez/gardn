@@ -6,11 +6,11 @@
 void tick_entity_motion(Simulation *sim, Entity &ent) {
     if (ent.pending_delete) return;
     if (ent.slow_ticks > 0) {
-        ent.speed_ratio *= 0.5;
+        ent.speed_ratio = std::min(ent.speed_ratio, 0.5f);
         --ent.slow_ticks;
     }
     if (ent.honey_ticks > 0) {
-        ent.speed_ratio *= 0.8;
+        ent.speed_ratio = std::min(ent.speed_ratio, 0.8f);
         --ent.honey_ticks;
     }
     ent.velocity *= (1 - ent.friction);

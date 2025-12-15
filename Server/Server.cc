@@ -30,7 +30,7 @@ void Server::tick() {
     for (GameInstance &game : Server::games) game.tick();
     auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> tick_time = end - start;
-    if (tick_time > 1000ms / TPS / 2) std::cout << "tick took " << tick_time << '\n';
+    if (tick_time > 1000ms / TPS) std::cout << "tick took " << tick_time << '\n';
 
     if (Server::is_draining && !was_draining) {
         was_draining = true;

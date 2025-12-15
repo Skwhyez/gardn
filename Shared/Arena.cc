@@ -35,6 +35,7 @@ void Arena::set_##name(type const v) { \
 }
 #define MULTIPLE(name, type, amt) \
 void Arena::set_##name(uint32_t i, type const v) { \
+    DEBUG_ONLY(assert(i < amt);) \
     if (name[i] == v) return; \
     name[i] = v; \
     BitMath::set_arr(state, k##name); \

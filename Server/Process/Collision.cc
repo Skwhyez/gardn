@@ -121,7 +121,7 @@ void on_collide(Simulation *sim, Entity &ent1, Entity &ent2) {
         pickup_drop(sim, ent1, ent2);
 
     if (ent1.has_component(kWeb) && !ent2.has_component(kPetal) && !ent2.has_component(kDrop))
-        ent2.speed_ratio *= 0.5;
+        ent2.speed_ratio = std::min(ent2.speed_ratio, 0.5f);
     if (ent2.has_component(kWeb) && !ent1.has_component(kPetal) && !ent1.has_component(kDrop))
-        ent1.speed_ratio *= 0.5;
+        ent1.speed_ratio = std::min(ent1.speed_ratio, 0.5f);
 }

@@ -4,3 +4,4 @@ node_modules/
 .vs/
 gardn-client.js
 gardn-client.wasm
+gardn-client.wasm.map

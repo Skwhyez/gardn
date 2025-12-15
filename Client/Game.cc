@@ -329,7 +329,8 @@ void Game::tick(double time) {
                 }
             }
         }
-        if (Game::cached_loadout[Game::loadout_count + Ui::UiLoadout::selected_with_keys] == PetalID::kNone)
+        if (Ui::UiLoadout::selected_with_keys < MAX_SLOT_COUNT &&
+            Game::cached_loadout[Game::loadout_count + Ui::UiLoadout::selected_with_keys] == PetalID::kNone)
             Ui::UiLoadout::selected_with_keys = MAX_SLOT_COUNT;
         if (!Game::show_chat && Ui::UiLoadout::selected_with_keys < MAX_SLOT_COUNT) {
             if (Input::keys_held_this_tick.contains('T')) {

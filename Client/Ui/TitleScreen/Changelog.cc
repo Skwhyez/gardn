@@ -90,7 +90,7 @@ static Element *make_changelog_contents() {
         make_date("September 27th 2025"),
         make_entries({
             "Game updates are now seamless for players",
-            "Multiple servers may exist at the same time"
+            "Several servers may exist at the same time"
         }),
         make_divider(),
         make_date("September 14th 2025"),

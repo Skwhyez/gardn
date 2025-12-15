@@ -187,8 +187,8 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
             PetalID::T tmp = player.get_loadout_ids(pos1);
             player.set_loadout_ids(pos1, player.get_loadout_ids(pos2));
             player.set_loadout_ids(pos2, tmp);
-            player.set_loadout_reloads(pos1, 0);
-            player.set_loadout_reloads(pos2, 0);
+            if (pos1 < player.get_loadout_count()) player.set_loadout_reloads(pos1, 0);
+            if (pos2 < player.get_loadout_count()) player.set_loadout_reloads(pos2, 0);
             break;
         }
         case Serverbound::kChatSend: {

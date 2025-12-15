@@ -32,8 +32,8 @@ extern "C" {
         }
         std::printf("client disconnect: [%d]\n", ws_id);
         Client::on_disconnect(iter->second, reason, {});
-        WS_MAP.erase(ws_id);
         delete iter->second;
+        WS_MAP.erase(ws_id);
     }
 
     void on_message(int ws_id, uint32_t len) {
@@ -65,6 +65,7 @@ extern "C" {
             if (loadout_ids[i] >= PetalID::kNumPetals) return false;
 
         player.set_score(score);
+        player.set_loadout_count(loadout_count);
         player.immunity_ticks = 3 * TPS;
         uint32_t difficulty = MAP_DATA[Map::get_zone_from_pos(player.get_x(), player.get_y())].difficulty;
         uint32_t power = Map::difficulty_at_level(score_to_level(score));
@@ -72,8 +73,15 @@ extern "C" {
             ZoneDefinition const &zone = MAP_DATA[Map::get_suitable_difficulty_zone(power)];
             player.set_x(0.99 * zone.left + 0.01 * zone.right);
         }
-        for (uint32_t i = 0; i < loadout_count + MAX_SLOT_COUNT; ++i) {
+        for (uint32_t i = 0; i < 2 * MAX_SLOT_COUNT; ++i) {
             PetalTracker::remove_petal(player.get_loadout_ids(i));
+            player.set_loadout_ids(i, PetalID::kNone);
+        }
+        for (uint32_t i = 0; i < MAX_SLOT_COUNT; ++i) {
+            LoadoutSlot &slot = player.loadout[i];
+            slot.update_id(sim, PetalID::kNone);
+        }
+        for (uint32_t i = 0; i < loadout_count + MAX_SLOT_COUNT; ++i) {
             player.set_loadout_ids(i, loadout_ids[i]);
             PetalTracker::add_petal(loadout_ids[i]);
         }
