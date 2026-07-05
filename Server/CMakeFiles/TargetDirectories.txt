@@ -1,0 +1,3 @@
+/workspaces/gardn/Server/CMakeFiles/gardn-server.dir
+/workspaces/gardn/Server/CMakeFiles/edit_cache.dir
+/workspaces/gardn/Server/CMakeFiles/rebuild_cache.dir

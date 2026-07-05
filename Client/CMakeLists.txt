@@ -101,6 +101,5 @@ add_link_options(-sEXPORTED_FUNCTIONS=_main,_key_event,_mouse_event,_touch_event
 add_executable(gardn-client ${SRCS})
 set(CMAKE_EXECUTABLE_SUFFIX ".js")
 
-if (WS_URL)
-    target_compile_definitions(gardn-client PRIVATE WS_URL="${WS_URL}")
-endif()
+set(WS_URL "wss://bookish-journey-wrrg5r77w79whg7qv-8080.app.github.dev" CACHE STRING "WebSocket URL")
+target_compile_definitions(gardn-client PRIVATE WS_URL="${WS_URL}")

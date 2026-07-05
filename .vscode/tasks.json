@@ -1,0 +1,80 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "HTTP Server",
+            "type": "shell",
+            "command": "http-server -c-1 --port 8080",
+            "options": {
+                "cwd": "${workspaceFolder}/Client/public"
+            },
+            "isBackground": true,
+            "runOptions": {
+                "runOn": "folderOpen"
+            },
+            "presentation": {
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Game Server",
+            "type": "shell",
+            "command": "until ./gardn-server; do sleep 1; done",
+            "options": {
+                "cwd": "${workspaceFolder}/Server"
+            },
+            "isBackground": true,
+            "runOptions": {
+                "runOn": "folderOpen"
+            },
+            "presentation": {
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Client Build",
+            "type": "shell",
+            "command": "cmake -S Client -B Client/build -DDEBUG=1 -DUSE_CODEPOINT_LEN=1 -DWS_URL=\"wss://${CODESPACE_NAME}-9001.app.github.dev\" && make -C Client/build -j$(nproc) && cp Client/build/gardn-client.* Client/public",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "runOptions": {
+                "runOn": "folderOpen"
+            },
+            "presentation": {
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Server Build",
+            "type": "shell",
+            "command": "make -C ${workspaceFolder}/Server -j$(nproc) && (killall gardn-server || true)",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "runOptions": {
+                "runOn": "folderOpen"
+            },
+            "presentation": {
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build All",
+            "dependsOn": [
+                "Client Build",
+                "Server Build"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
