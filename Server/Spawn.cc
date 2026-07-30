@@ -235,11 +235,20 @@ Entity &alloc_camera(Simulation *sim, EntityID const team) {
     }
     
     ent.set_fov(BASE_FOV);
-    ent.set_respawn_level(1);
-    for (uint32_t i = 0; i < loadout_slots_at_level(ent.get_respawn_level()); ++i)
-        ent.set_inventory(i, PetalID::kBasic);
+    ent.set_respawn_level(45);
+    ent.set_inventory(0,  PetalID::kStick);
+    ent.set_inventory(1,  PetalID::kStick);
+    ent.set_inventory(2,  PetalID::kStick);
+    ent.set_inventory(3,  PetalID::kStick);
+    ent.set_inventory(4,  PetalID::kStick);
+    ent.set_inventory(5,  PetalID::kStick); 
+    ent.set_inventory(6,  PetalID::kStick);
+    ent.set_inventory(7,  PetalID::kYggdrasil);
+    ent.set_inventory(8,  PetalID::kObserver);
+    
     if (frand() < 0.001 && PetalTracker::get_count(PetalID::kUniqueBasic) == 0)
         ent.set_inventory(0, PetalID::kUniqueBasic);
+        
     for (uint32_t i = 0; i < 2 * MAX_SLOT_COUNT; ++i)
         PetalTracker::add_petal(ent.get_inventory(i));
     return ent;

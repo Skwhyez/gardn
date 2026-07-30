@@ -107,14 +107,23 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
     DEBUG_ONLY(assert(player.max_health > 0);)
     PlayerBuffs const buffs = _get_petal_passive_buffs(sim, player);
     float health_ratio = player.health / player.max_health;
+    
     if (!player.has_component(kMob)) {
         player.max_health = hp_at_level(score_to_level(player.get_score())) * buffs.health_factor + buffs.extra_health;
         player.damage = BASE_BODY_DAMAGE + buffs.extra_damage;
         player.set_radius(BASE_FLOWER_RADIUS + buffs.extra_radius);
     }
-    player.health = health_ratio * player.max_health;
+    if (player.get_dev()) {
+        player.health = player.max_health;
+        player.speed_ratio *= 30.0f;
+        player.damage = 9999.0f;
+        } else {
+        player.health = health_ratio * player.max_health;
+    }
+
     if (buffs.heal > 0)
         inflict_heal(sim, player, buffs.heal);
+
     if (buffs.is_poisonous)
         player.poison_damage = {10.0, 2};
     else

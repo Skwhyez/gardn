@@ -1346,7 +1346,7 @@ std::array<StaticArray<float, MAX_DROPS_PER_MOB>, MobID::kNumMobs> const MOB_DRO
 
     for (MobID::T id = 0; id < MobID::kNumMobs; ++id) {
         for (PetalID::T const drop_id : MOB_DATA[id].drops) {
-            float chance = fclamp((BASE_NUM * RARITY_MULT[PETAL_DATA[drop_id].rarity]) / (PETAL_AGGREGATE_DROPS[drop_id] * MOB_SPAWN_RATES[id] * MOB_DATA[id].attributes.segments), 0, 1);
+            float chance = fclamp(((BASE_NUM * RARITY_MULT[PETAL_DATA[drop_id].rarity]) / (PETAL_AGGREGATE_DROPS[drop_id] * MOB_SPAWN_RATES[id] * MOB_DATA[id].attributes.segments)) * 100.0f, 0, 1);
             ret[id].push(chance);
         }
     }

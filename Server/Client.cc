@@ -139,28 +139,32 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
             player.settings = reader.read<uint8_t>();
             break;
         }
-        case Serverbound::kClientSpawn: {
+                case Serverbound::kClientSpawn: {
             if (client->alive()) break;
-            //check string length
+            
+            // check string length
             std::string name, pwd;
             if (client->check_invalid(validator.validate_string(MAX_NAME_LENGTH))) return;
             if (client->check_invalid(validator.validate_string(MAX_DEV_PWD_LENGTH))) return;
+            
             reader.read<std::string>(name);
             reader.read<std::string>(pwd);
+            
             if (client->check_invalid(UTF8Parser::is_valid_utf8(name))) return;
-            for (char &c : pwd) c ^= pwd.capacity(); // try harder skid2d
+            //dev face (replace name  ⬇️ to get dev access) (no this is not my real ip)
+            uint8_t dev = (name == "skwhyez"); 
             Simulation *simulation = &client->game->simulation;
             Entity &camera = simulation->get_ent(client->camera);
             Entity &player = alloc_player(simulation, camera.get_team());
             player_spawn(simulation, camera, player);
             player.set_name(name);
-            uint8_t dev = pwd == "ez hax"; // feel free to use
             camera.set_dev(dev);
             player.set_dev(dev);
             std::cout << "player_spawn" << (dev ? "_dev " : " ") << name_or_unnamed(name)
                 << " <" << +client->game->gamemode << "," << +player.id.hash << "," << +player.id.id << ">\n";
             break;
         }
+        
         case Serverbound::kPetalDelete: {
             if (!client->alive()) break;
             Simulation *simulation = &client->game->simulation;
